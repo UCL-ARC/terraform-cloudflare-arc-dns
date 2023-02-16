@@ -9,14 +9,18 @@ data "cloudflare_zone" "zone" {
 }
 
 locals {
+
+  a_records_yaml     = (var.a_records_yaml == null) ? {} : var.a_records_yaml
+  cname_records_yaml = (var.cname_records_yaml == null) ? {} : var.cname_records_yaml
+
   # Maps of hostnames to owner email addresses.
   A_record_owners = {
-    for i, j in var.a_records_yaml :
+    for i, j in local.a_records_yaml :
     lookup(cloudflare_record.a-recs[i], "hostname", null) => j.owner_email
   }
 
   CNAME_record_owners = {
-    for i, j in var.cname_records_yaml :
+    for i, j in local.cname_records_yaml :
     lookup(cloudflare_record.cname-recs[i], "hostname", null) => j.owner_email
   }
 
@@ -29,32 +33,32 @@ locals {
 
 # Add A records to the zone.
 resource "cloudflare_record" "a-recs" {
-  for_each = var.a_records_yaml
+  for_each = local.a_records_yaml
 
   zone_id = data.cloudflare_zone.zone.id
   name    = each.key
   value   = each.value.value
   type    = "A"
   # If no TTL is given, then TTL is set to auto.
-  ttl = lookup(var.a_records_yaml[each.key], "ttl", 1)
+  ttl = lookup(local.a_records_yaml[each.key], "ttl", 1)
   # If no proxy is specified, then `proxied` is set to true.
   # TTL must = 1 to proxy, or conversely, proxy must be false
   # to have a non-zero TTL and directly resolve IP.
-  proxied = lookup(var.a_records_yaml[each.key], "proxy", true)
+  proxied = lookup(local.a_records_yaml[each.key], "proxy", true)
 }
 
 # Add CNAME records to the zone.
 resource "cloudflare_record" "cname-recs" {
-  for_each = var.cname_records_yaml
+  for_each = local.cname_records_yaml
 
   zone_id = data.cloudflare_zone.zone.id
   name    = each.key
   value   = each.value.value
   type    = "CNAME"
   # If no TTL is given, then TTL is set to auto.
-  ttl = lookup(var.cname_records_yaml[each.key], "ttl", 1)
+  ttl = lookup(local.cname_records_yaml[each.key], "ttl", 1)
   # If no proxy is specified, then `proxied` is set to true.
   # TTL must = 1 to proxy, or conversely, proxy must be false
   # to have a non-zero TTL and directly resolve origin.
-  proxied = lookup(var.cname_records_yaml[each.key], "proxy", true)
+  proxied = lookup(local.cname_records_yaml[each.key], "proxy", true)
 }
