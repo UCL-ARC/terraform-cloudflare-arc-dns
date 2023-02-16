@@ -10,8 +10,8 @@ data "cloudflare_zone" "zone" {
 
 locals {
 
-  a_records_yaml     = (var.a_records_yaml == {}) ? null : var.a_records_yaml
-  cname_records_yaml = (var.cname_records_yaml == {}) ? null : var.cname_records_yaml
+  a_records_yaml     = (var.a_records_yaml == null) ? null : var.a_records_yaml
+  cname_records_yaml = (var.cname_records_yaml == null) ? null : var.cname_records_yaml
 
   # Maps of hostnames to owner email addresses.
   A_record_owners = {
