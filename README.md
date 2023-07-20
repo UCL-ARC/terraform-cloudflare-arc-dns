@@ -40,3 +40,14 @@ which would result in the creation of `<SUBDOMAIN1>.<DOMAIN>` and `<SUBDOMAIN2>.
   owner_email: email@example.com
 ```
 which will create a CNAME record for `<SUBDOMAIN3>.<DOMAIN>` pointing to `<DEST_HOSTNAME>`. By default this is proxied through Cloudflare.
+
+
+----
+
+## Contributing
+
+- Fork this repository and create a branch.
+- Use the `[issue-type]-[issue-number]-[issue-title]` branching convention and favour short-lived branches.
+- Raise Pull Requests (PR) against `main` for review.
+- The person approving the review is responsible for merging and deleting the
+  branch.

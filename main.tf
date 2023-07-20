@@ -10,8 +10,8 @@ data "cloudflare_zone" "zone" {
 
 locals {
 
-  a_records_yaml     = try(yamldecode(var.a_records_yaml),{})
-  cname_records_yaml = try(yamldecode(var.cname_records_yaml),{})
+  a_records_yaml     = try(yamldecode(var.a_records_yaml), {})
+  cname_records_yaml = try(yamldecode(var.cname_records_yaml), {})
 
   # Maps of hostnames to owner email addresses.
   A_record_owners = {
@@ -36,7 +36,7 @@ resource "cloudflare_record" "a-recs" {
   for_each = local.a_records_yaml
 
   zone_id = data.cloudflare_zone.zone.id
-  name    = each.key
+  name    = can(each.value.name) ? each.value.name : each.key
   value   = each.value.value
   type    = "A"
   # If no TTL is given, then TTL is set to auto.
@@ -52,7 +52,7 @@ resource "cloudflare_record" "cname-recs" {
   for_each = local.cname_records_yaml
 
   zone_id = data.cloudflare_zone.zone.id
-  name    = each.key
+  name    = can(each.value.name) ? each.value.name : each.key
   value   = each.value.value
   type    = "CNAME"
   # If no TTL is given, then TTL is set to auto.
