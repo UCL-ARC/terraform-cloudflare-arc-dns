@@ -46,7 +46,7 @@ which will create a CNAME record for `<SUBDOMAIN3>.<DOMAIN>` pointing to `<DEST_
 
 ## Contributing
 
-- Fork this repository and create a branch
+- Fork this repository and create a branch.
 - Use the `[issue-type]-[issue-number]-[issue-title]` branching convention and favour short-lived branches.
 - Raise Pull Requests (PR) against `main` for review.
 - The person approving the review is responsible for merging and deleting the
