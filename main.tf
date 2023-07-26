@@ -13,22 +13,25 @@ locals {
   a_records_yaml     = try(yamldecode(var.a_records_yaml), {})
   cname_records_yaml = try(yamldecode(var.cname_records_yaml), {})
 
-  # Maps of hostnames to owner email addresses.
-  A_record_owners = {
-    for i, j in local.a_records_yaml :
-    lookup(cloudflare_record.a-recs[i], "hostname", null) => j.owner_email
-  }
+  # Complete set of owners for A or CNAME records.
+  record_owners = toset(concat(
+    [for record in local.a_records_yaml : record.owner_email],
+    [for record in local.cname_records_yaml : record.owner_email]
+  ))
 
-  CNAME_record_owners = {
-    for i, j in local.cname_records_yaml :
-    lookup(cloudflare_record.cname-recs[i], "hostname", null) => j.owner_email
+  # Map of hostnames to owner email addresses.
+  record_owners_and_hostnames = {
+    for owner in local.record_owners :
+    "${owner}" => compact(
+      concat(
+        [for k, v in cloudflare_record.a-recs : local.a_records_yaml[k].owner_email == owner ? v.hostname : null],
+        [for k, v in cloudflare_record.cname-recs : local.cname_records_yaml[k].owner_email == owner ? v.hostname : null]
+      )
+    )
   }
 
   # Create list of all FQDNs.
   fqdns = concat(values(cloudflare_record.a-recs).*.hostname, values(cloudflare_record.cname-recs).*.hostname)
-  # Crate map of all hostnames to owners.
-  owners = merge(local.A_record_owners, local.CNAME_record_owners)
-
 }
 
 # Add A records to the zone.

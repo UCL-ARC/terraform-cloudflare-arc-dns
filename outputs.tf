@@ -5,6 +5,5 @@ output "fqdns" {
 
 # Map of hostnames to owner email addresses.
 output "owners" {
-  value = local.owners
+  value = local.record_owners_and_hostnames
 }
-
