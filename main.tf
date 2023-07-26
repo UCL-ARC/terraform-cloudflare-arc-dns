@@ -15,19 +15,19 @@ locals {
 
   # Complete set of owners for A or CNAME records.
   record_owners = toset(concat(
-    [for record in local.a_records_yaml: record.owner_email],
-    [for record in local.cname_records_yaml: record.owner_email]
+    [for record in local.a_records_yaml : record.owner_email],
+    [for record in local.cname_records_yaml : record.owner_email]
   ))
 
   # Map of hostnames to owner email addresses.
   record_owners_and_hostnames = {
     for owner in local.record_owners :
     "${owner}" => compact(
-        concat(
-          [for k, v in cloudflare_record.a-recs: local.a_records_yaml[k].owner_email == owner ? v.hostname : null],
-          [for k, v in cloudflare_record.cname-recs: local.cname_records_yaml[k].owner_email == owner ? v.hostname : null]
-        )
+      concat(
+        [for k, v in cloudflare_record.a-recs : local.a_records_yaml[k].owner_email == owner ? v.hostname : null],
+        [for k, v in cloudflare_record.cname-recs : local.cname_records_yaml[k].owner_email == owner ? v.hostname : null]
       )
+    )
   }
 
   # Create list of all FQDNs.
