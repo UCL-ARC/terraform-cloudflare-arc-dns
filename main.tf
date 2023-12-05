@@ -44,7 +44,7 @@ resource "cloudflare_record" "a-recs" {
   value   = each.value.value
   type    = "A"
   # If no TTL is given, then TTL is set to auto.
-  ttl     = lookup(local.a_records_yaml[each.key], "ttl", 1)
+  ttl = lookup(local.a_records_yaml[each.key], "ttl", 1)
   # If no proxy is specified, then `proxied` is set to true.
   # TTL must = 1 to proxy, or conversely, proxy must be false
   # to have a non-zero TTL and directly resolve IP.
@@ -60,7 +60,7 @@ resource "cloudflare_record" "cname-recs" {
   value   = each.value.value
   type    = "CNAME"
   # If no TTL is given, then TTL is set to auto.
-  ttl     = lookup(local.cname_records_yaml[each.key], "ttl", 1)
+  ttl = lookup(local.cname_records_yaml[each.key], "ttl", 1)
   # If no proxy is specified, then `proxied` is set to true.
   # TTL must = 1 to proxy, or conversely, proxy must be false
   # to have a non-zero TTL and directly resolve origin.
@@ -76,5 +76,5 @@ resource "cloudflare_record" "txt-recs" {
   value   = each.value.value
   type    = "TXT"
   # If no TTL is given, then TTL is set to auto.
-  ttl     = lookup(local.txt_records_yaml[each.key], "ttl", 1)
+  ttl = lookup(local.txt_records_yaml[each.key], "ttl", 1)
 }
