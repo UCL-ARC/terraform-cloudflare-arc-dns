@@ -17,3 +17,8 @@ variable "a_records_yaml" {
 variable "cname_records_yaml" {
   default = {}
 }
+
+# YAML containing one or more TXT records
+variable "txt_records_yaml" {
+  default = {}
+}

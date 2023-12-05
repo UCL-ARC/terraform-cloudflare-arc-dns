@@ -12,6 +12,7 @@ module "my-zone" {
 
   a_records_yaml     = yamldecode(file("${path.module}/a-records.yaml"))
   cname_records_yaml = yamldecode(file("${path.module}/cname-records.yaml"))
+  txt_records_yaml = yamldecode(file("${path.module}/text-records.yaml"))
 }
 ```
 
@@ -41,6 +42,14 @@ which would result in the creation of `<SUBDOMAIN1>.<DOMAIN>` and `<SUBDOMAIN2>.
 ```
 which will create a CNAME record for `<SUBDOMAIN3>.<DOMAIN>` pointing to `<DEST_HOSTNAME>`. By default this is proxied through Cloudflare.
 
+`txt-records.yaml` contains the TXT records to create:
+```yaml
+---
+<SUBDOMAIN4>:
+  value: "<CONTENT>"
+  owner_email: email@example.com
+```
+which will create a TXT record for `<SUBDOMAIN4>.<DOMAIN>` with the value `<CONTENT>`.
 
 ----
 
