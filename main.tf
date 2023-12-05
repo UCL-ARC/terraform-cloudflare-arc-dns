@@ -12,7 +12,7 @@ locals {
 
   a_records_yaml     = try(yamldecode(var.a_records_yaml), {})
   cname_records_yaml = try(yamldecode(var.cname_records_yaml), {})
-  txt_records_yaml   = try(yamldecode(var.cname_records_yaml), {})
+  txt_records_yaml   = try(yamldecode(var.txt_records_yaml), {})
 
   # Complete set of owners for A or CNAME records.
   record_owners = toset(concat(
