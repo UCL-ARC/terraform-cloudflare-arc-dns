@@ -12,7 +12,7 @@ module "my-zone" {
 
   a_records_yaml     = yamldecode(file("${path.module}/a-records.yaml"))
   cname_records_yaml = yamldecode(file("${path.module}/cname-records.yaml"))
-  txt_records_yaml = yamldecode(file("${path.module}/text-records.yaml"))
+  txt_records_yaml = yamldecode(file("${path.module}/txt-records.yaml"))
 }
 ```
 
