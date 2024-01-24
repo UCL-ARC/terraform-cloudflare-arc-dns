@@ -12,6 +12,7 @@ locals {
 
   a_records_yaml     = try(yamldecode(var.a_records_yaml), {})
   cname_records_yaml = try(yamldecode(var.cname_records_yaml), {})
+  txt_records_yaml   = try(yamldecode(var.txt_records_yaml), {})
 
   # Complete set of owners for A or CNAME records.
   record_owners = toset(concat(
@@ -64,4 +65,16 @@ resource "cloudflare_record" "cname-recs" {
   # TTL must = 1 to proxy, or conversely, proxy must be false
   # to have a non-zero TTL and directly resolve origin.
   proxied = lookup(local.cname_records_yaml[each.key], "proxy", true)
+}
+
+# Add TXT records to the zone.
+resource "cloudflare_record" "txt-recs" {
+  for_each = local.txt_records_yaml
+
+  zone_id = data.cloudflare_zone.zone.id
+  name    = can(each.value.name) ? each.value.name : each.key
+  value   = each.value.value
+  type    = "TXT"
+  # If no TTL is given, then TTL is set to auto.
+  ttl = lookup(local.txt_records_yaml[each.key], "ttl", 1)
 }
