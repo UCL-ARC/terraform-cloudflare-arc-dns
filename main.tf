@@ -25,23 +25,25 @@ locals {
     for owner in local.record_owners :
     "${owner}" => compact(
       concat(
-        [for k, v in cloudflare_record.a-recs : local.a_records_yaml[k].owner_email == owner ? v.hostname : null],
-        [for k, v in cloudflare_record.cname-recs : local.cname_records_yaml[k].owner_email == owner ? v.hostname : null]
+        [for k, v in cloudflare_dns_record.a-recs : local.a_records_yaml[k].owner_email == owner ? v.hostname : null],
+        [for k, v in cloudflare_dns_record.cname-recs : local.cname_records_yaml[k].owner_email == owner ? v.hostname : null]
       )
     )
   }
 
   # Create list of all FQDNs.
-  fqdns = concat(values(cloudflare_record.a-recs).*.hostname, values(cloudflare_record.cname-recs).*.hostname)
+  fqdns = concat(values(cloudflare_dns_record.a-recs).*.hostname, values(cloudflare_dns_record.cname-recs).*.hostname)
 }
 
+
+
+
 # Add A records to the zone.
-resource "cloudflare_record" "a-recs" {
+resource "cloudflare_dns_record" "a-recs" {
   for_each = local.a_records_yaml
 
   zone_id = data.cloudflare_zone.zone.id
   name    = can(each.value.name) ? each.value.name : each.key
-  value   = each.value.value
   type    = "A"
   # If no TTL is given, then TTL is set to auto.
   ttl = lookup(local.a_records_yaml[each.key], "ttl", 1)
@@ -49,15 +51,20 @@ resource "cloudflare_record" "a-recs" {
   # TTL must = 1 to proxy, or conversely, proxy must be false
   # to have a non-zero TTL and directly resolve IP.
   proxied = lookup(local.a_records_yaml[each.key], "proxy", true)
+  content = each.value.value
+}
+
+moved {
+  from = cloudflare_record.a-recs
+  to   = cloudflare_dns_record.a-recs
 }
 
 # Add CNAME records to the zone.
-resource "cloudflare_record" "cname-recs" {
+resource "cloudflare_dns_record" "cname-recs" {
   for_each = local.cname_records_yaml
 
   zone_id = data.cloudflare_zone.zone.id
   name    = can(each.value.name) ? each.value.name : each.key
-  value   = each.value.value
   type    = "CNAME"
   # If no TTL is given, then TTL is set to auto.
   ttl = lookup(local.cname_records_yaml[each.key], "ttl", 1)
@@ -65,16 +72,27 @@ resource "cloudflare_record" "cname-recs" {
   # TTL must = 1 to proxy, or conversely, proxy must be false
   # to have a non-zero TTL and directly resolve origin.
   proxied = lookup(local.cname_records_yaml[each.key], "proxy", true)
+  content = each.value.value
+}
+
+moved {
+  from = cloudflare_record.cname-recs
+  to   = cloudflare_dns_record.cname-recs
 }
 
 # Add TXT records to the zone.
-resource "cloudflare_record" "txt-recs" {
+resource "cloudflare_dns_record" "txt-recs" {
   for_each = local.txt_records_yaml
 
   zone_id = data.cloudflare_zone.zone.id
   name    = can(each.value.name) ? each.value.name : each.key
-  value   = each.value.value
   type    = "TXT"
   # If no TTL is given, then TTL is set to auto.
-  ttl = lookup(local.txt_records_yaml[each.key], "ttl", 1)
+  ttl     = lookup(local.txt_records_yaml[each.key], "ttl", 1)
+  content = each.value.value
+}
+
+moved {
+  from = cloudflare_record.txt-recs
+  to   = cloudflare_dns_record.txt-recs
 }
