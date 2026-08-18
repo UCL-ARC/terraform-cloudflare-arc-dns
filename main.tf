@@ -25,14 +25,14 @@ locals {
     for owner in local.record_owners :
     "${owner}" => compact(
       concat(
-        [for k, v in cloudflare_dns_record.a-recs : local.a_records_yaml[k].owner_email == owner ? v.hostname : null],
-        [for k, v in cloudflare_dns_record.cname-recs : local.cname_records_yaml[k].owner_email == owner ? v.hostname : null]
+        [for k, v in cloudflare_dns_record.a-recs : local.a_records_yaml[k].owner_email == owner ? v.name : null],
+        [for k, v in cloudflare_dns_record.cname-recs : local.cname_records_yaml[k].owner_email == owner ? v.name : null]
       )
     )
   }
 
   # Create list of all FQDNs.
-  fqdns = concat(values(cloudflare_dns_record.a-recs).*.hostname, values(cloudflare_dns_record.cname-recs).*.hostname)
+  fqdns = concat(values(cloudflare_dns_record.a-recs).*.name, values(cloudflare_dns_record.cname-recs).*.name)
 }
 
 
