@@ -54,11 +54,6 @@ resource "cloudflare_dns_record" "a-recs" {
   content = each.value.value
 }
 
-moved {
-  from = cloudflare_record.a-recs
-  to   = cloudflare_dns_record.a-recs
-}
-
 # Add CNAME records to the zone.
 resource "cloudflare_dns_record" "cname-recs" {
   for_each = local.cname_records_yaml
@@ -75,11 +70,6 @@ resource "cloudflare_dns_record" "cname-recs" {
   content = each.value.value
 }
 
-moved {
-  from = cloudflare_record.cname-recs
-  to   = cloudflare_dns_record.cname-recs
-}
-
 # Add TXT records to the zone.
 resource "cloudflare_dns_record" "txt-recs" {
   for_each = local.txt_records_yaml
@@ -90,9 +80,4 @@ resource "cloudflare_dns_record" "txt-recs" {
   # If no TTL is given, then TTL is set to auto.
   ttl     = lookup(local.txt_records_yaml[each.key], "ttl", 1)
   content = each.value.value
-}
-
-moved {
-  from = cloudflare_record.txt-recs
-  to   = cloudflare_dns_record.txt-recs
 }
